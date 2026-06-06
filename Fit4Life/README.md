@@ -1,7 +1,7 @@
 
   # Fit4Life
 
-  This is a code bundle for Fit4Life. The original project is available at https://www.figma.com/design/sQZWyKOMsf89jpbE1WSfzQ/Fit4Life.
+  This is a code bundle for Fit4Life. The original project was started via Figma.
 
   ## Running the code
 
