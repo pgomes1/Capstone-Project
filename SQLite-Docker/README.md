@@ -7,7 +7,7 @@ Run the following:
 `docker build -t sqlite-fit4life-db .`
 ### For running the container with persistence:
 Run the following:
-`docker run -it --name fitness_db_container -v $(pwd)/data:/app sqlite-fitness-db`
+`docker run -it --name fit4life_db_container -v $(pwd)/data:/app sqlite-fit4life-db`
 This will start the container, and mount local folder named data on your machine to the /app folder inside the container.
 
 ## Additional things of note:
