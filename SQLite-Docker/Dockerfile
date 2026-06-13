@@ -8,7 +8,10 @@ WORKDIR /app
 
 # Copy the initialization script into the container.
 COPY init.sql .
+COPY entrypoint.sh .
 
-RUN sqlite3 /app/fit4life.db < /app/init.sql
+# Make entrypoint executable
+RUN chmod +x /app/entrypoint.sh
 
-CMD ["sqlite3", "/app/fit4life.db"]
+# Use the entrypoint script to initialize and keep container running
+ENTRYPOINT ["/app/entrypoint.sh"]

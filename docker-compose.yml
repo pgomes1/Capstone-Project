@@ -7,13 +7,13 @@ services:
       context: ./SQLite-Docker
     container_name: fit4life_db
     volumes:
-      - db_data:/app
-    ports:
-      - "5432:5432"  # Exposed for potential connections
+      - db_data:/data
     networks:
       - fit4life-network
+    environment:
+      - DB_PATH=/data/fit4life.db
     healthcheck:
-      test: ["CMD", "sqlite3", "/app/fit4life.db", "SELECT 1"]
+      test: ["CMD", "sqlite3", "/data/fit4life.db", "SELECT 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,9 +27,9 @@ services:
       sqlite-db:
         condition: service_healthy
     volumes:
-      - db_data:/app/db_data
+      - db_data:/data
     environment:
-      - SQLITE_PATH=/app/db_data/fit4life.db
+      - SQLITE_PATH=/data/fit4life.db
       - SUPABASE_URL=${SUPABASE_URL:-https://your-project.supabase.co}
       - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
