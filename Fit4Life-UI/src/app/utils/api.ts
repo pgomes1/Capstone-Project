@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { projectId, publicAnonKey } from "/utils/supabase/info";
 
-const SERVER = `https://${projectId}.supabase.co/functions/v1/make-server-2d0d4912`;
+const SERVER = "http://localhost:8000/api";
 
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
@@ -35,14 +35,14 @@ export interface RunSession {
 }
 
 export async function signUp(email: string, password: string, name: string) {
-  const res = await fetch(`${SERVER}/signup`, {
+  const res = await fetch(`${SERVER}/auth/signup`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${publicAnonKey}` },
     body: JSON.stringify({ email, password, name }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error ?? "Signup failed");
-  return data.user;
+  if (!res.ok) throw new Error(data.error?.message ?? "Signup failed");
+  return data.data.user;
 }
 
 export async function signIn(email: string, password: string) {
@@ -66,8 +66,8 @@ export async function getSession() {
 export async function getRuns(): Promise<RunSession[]> {
   const res = await fetch(`${SERVER}/runs`, { headers: await authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error ?? "Failed to fetch runs");
-  return data.runs ?? [];
+  if (!res.ok) throw new Error(data.error?.message ?? "Failed to fetch runs");
+  return data.data?.runs ?? [];
 }
 
 export async function addRuns(
@@ -79,8 +79,8 @@ export async function addRuns(
     body: JSON.stringify({ sessions }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error ?? "Failed to add runs");
-  return data.runs ?? [];
+  if (!res.ok) throw new Error(data.error?.message ?? "Failed to add runs");
+  return data.data?.runs ?? [];
 }
 
 export async function deleteRun(id: string) {
@@ -90,6 +90,6 @@ export async function deleteRun(id: string) {
   });
   if (!res.ok) {
     const data = await res.json();
-    throw new Error(data.error ?? "Failed to delete run");
+    throw new Error(data.error?.message ?? "Failed to delete run");
   }
 }

@@ -15,7 +15,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    SQLITE_PATH: str = Field(default="../SQLite-Docker/data/fit4life.db")
+    SQLITE_PATH: str = Field(default="/app/db_data/fit4life.db")
     SUPABASE_URL: str = Field(default="")
     SUPABASE_ANON_KEY: str = Field(default="")
     SUPABASE_SERVICE_ROLE_KEY: str = Field(default="")

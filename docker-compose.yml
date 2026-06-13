@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # SQLite Database Container
+  sqlite-db:
+    build:
+      context: ./SQLite-Docker
+    container_name: fit4life_db
+    volumes:
+      - db_data:/app
+    ports:
+      - "5432:5432"  # Exposed for potential connections
+    networks:
+      - fit4life-network
+    healthcheck:
+      test: ["CMD", "sqlite3", "/app/fit4life.db", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Backend Container
+  backend:
+    build:
+      context: ./Fit4Life-Backend
+    container_name: fit4life_backend
+    depends_on:
+      sqlite-db:
+        condition: service_healthy
+    volumes:
+      - db_data:/app/db_data
+    environment:
+      - SQLITE_PATH=/app/db_data/fit4life.db
+      - SUPABASE_URL=${SUPABASE_URL:-https://your-project.supabase.co}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET:-}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173}
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    networks:
+      - fit4life-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  fit4life-network:
+    driver: bridge
