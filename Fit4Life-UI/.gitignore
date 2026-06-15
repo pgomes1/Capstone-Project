@@ -1,0 +1,24 @@
+.env
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# TanStack Router (auto-generated)
+src/routeTree.gen.ts
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
