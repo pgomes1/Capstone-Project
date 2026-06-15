@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import jwt
 from fastapi import Header
 
-from config.settings import get_settings
+from config.settings import get_jwt_secret
 from lib.errors import AUTH_ERROR, raise_http
 
 
@@ -18,17 +18,12 @@ def verify_jwt(authorization: str | None = Header(default=None)) -> AuthedUser:
         raise_http(AUTH_ERROR, "Missing or malformed Authorization header", 401)
 
     token = authorization.split(" ", 1)[1].strip()
-    settings = get_settings()
-
-    if not settings.SUPABASE_JWT_SECRET:
-        raise_http(AUTH_ERROR, "Server is not configured for JWT verification", 500)
 
     try:
         payload = jwt.decode(
             token,
-            settings.SUPABASE_JWT_SECRET,
+            get_jwt_secret(),
             algorithms=["HS256"],
-            audience="authenticated",
         )
     except jwt.ExpiredSignatureError:
         raise_http(AUTH_ERROR, "Token expired", 401)

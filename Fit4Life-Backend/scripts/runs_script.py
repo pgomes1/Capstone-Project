@@ -8,35 +8,12 @@ from middleware.auth import AuthedUser
 from models.runs import RunIn, RunOut
 
 
-def _username_from_email(email: str) -> str:
-    local = email.split("@", 1)[0]
-    return local or email
-
-
-def _resolve_local_user_id(conn: sqlite3.Connection, authed: AuthedUser) -> int:
-    """Get the local users.user_id for the Supabase-authenticated user.
-
-    The local users row is normally seeded at signup. If a valid JWT arrives
-    without a matching row (legacy/imported user), lazily create one.
-    """
-    if not authed.email:
-        raise_http(DB_ERROR, "JWT missing email; cannot resolve local user", status_code=400)
-
-    cursor = conn.cursor()
+def _resolve_local_user_id(authed: AuthedUser) -> int:
+    """The JWT's sub is the local users.user_id, set at signin time."""
     try:
-        cursor.execute("SELECT user_id FROM users WHERE email = ?", (authed.email,))
-        row = cursor.fetchone()
-        if row is not None:
-            return int(row["user_id"])
-
-        cursor.execute(
-            "INSERT INTO users (username, email) VALUES (?, ?)",
-            (_username_from_email(authed.email), authed.email),
-        )
-        conn.commit()
-        return int(cursor.lastrowid or 0)
-    finally:
-        cursor.close()
+        return int(authed.sub)
+    except (TypeError, ValueError):
+        raise_http(DB_ERROR, "Invalid user identifier in token", status_code=400)
 
 
 def _row_to_run_out(row: sqlite3.Row) -> RunOut:
@@ -51,10 +28,10 @@ def _row_to_run_out(row: sqlite3.Row) -> RunOut:
 
 
 def list_runs(authed: AuthedUser) -> list[RunOut]:
+    user_id = _resolve_local_user_id(authed)
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        user_id = _resolve_local_user_id(conn, authed)
         cursor.execute(
             """
             SELECT run_id, user_id, run_date, distance_mi, duration_minutes, created_at
@@ -76,10 +53,10 @@ def list_runs(authed: AuthedUser) -> list[RunOut]:
 
 
 def add_runs(authed: AuthedUser, sessions: list[RunIn]) -> list[RunOut]:
+    user_id = _resolve_local_user_id(authed)
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        user_id = _resolve_local_user_id(conn, authed)
         new_ids: list[int] = []
         for s in sessions:
             cursor.execute(
@@ -123,10 +100,10 @@ def delete_run(authed: AuthedUser, run_id: str) -> None:
     except ValueError:
         raise_http(RUN_NOT_FOUND, "Run not found", status_code=404)
 
+    user_id = _resolve_local_user_id(authed)
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        user_id = _resolve_local_user_id(conn, authed)
         cursor.execute(
             "DELETE FROM runs WHERE run_id = ? AND user_id = ?",
             (rid, user_id),

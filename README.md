@@ -2,81 +2,65 @@
 
 The fitness tracker capstone project of Group Echo.
 
-## Project Overview
+## Quick start
 
-This repository contains three main components:
-- **Fit4Life-Backend**: RESTful API backend built with Python
-- **Fit4Life-UI**: React/TypeScript frontend user interface
-- **SQLite-Docker**: Docker setup for the SQLite database server
+```bash
+git clone <repo-url>
+cd Capstone-Project
+docker compose up -d --build
+```
 
----
+Open <http://localhost:5173> in a browser. That's it.
 
-## Directory Structure
+The stack runs entirely on your machine in Docker. Each teammate has
+their own isolated database — like a mobile app that stores data on
+the device.
+
+### Common commands
+
+| Command | What it does |
+|---|---|
+| `docker compose up -d --build` | Start everything (first run or after code changes) |
+| `docker compose up -d` | Start everything (using cached images) |
+| `docker compose ps` | Check service health |
+| `docker compose logs -f` | Tail logs from all services |
+| `docker compose down` | Stop everything; keep data |
+| `docker compose down -v` | Stop everything and wipe the local database (factory reset) |
+
+## Project layout
 
 ### 📂 [Fit4Life-Backend](Fit4Life-Backend)
-The backend API server handling all business logic, authentication, and data persistence.
-
-```
-Fit4Life-Backend/
-├── config/                 # Application configuration
-├── db/                     # Database connection and schema
-├── endpoints/              # API route handlers
-├── integrations/           # Third-party integrations (Supabase)
-├── lib/                    # Shared utilities and error handling
-├── middleware/             # CORS, authentication middleware
-├── models/                 # Data models and schemas
-├── scripts/                # Database and utility scripts
-├── utils/                  # Helper utilities
-├── main.py                 # Application entry point
-├── Dockerfile              # Container configuration
-├── Makefile                # Build and run commands
-└── requirements.txt        # Python dependencies
-```
-
-**See [Fit4Life-Backend/README.md](Fit4Life-Backend/README.md) for detailed documentation.**
-
----
+Python / FastAPI API at <http://localhost:8000/api>. Reads/writes a
+local SQLite database, issues its own JWTs (no cloud auth).
+See [Fit4Life-Backend/AGENTS.md](Fit4Life-Backend/AGENTS.md) for
+backend conventions.
 
 ### 📂 [Fit4Life-UI](Fit4Life-UI)
-The frontend user interface built with React, TypeScript, and Vite.
-
-```
-Fit4Life-UI/
-├── src/
-│   ├── app/
-│   │   ├── components/     # React components (pages and UI)
-│   │   ├── utils/          # Application utilities
-│   │   └── App.tsx         # Main app component
-│   ├── styles/             # Global CSS and theming
-│   └── test/               # Unit and integration tests
-├── supabase/               # Supabase client configuration
-├── utils/                  # Shared utility functions
-├── vite.config.ts          # Vite build configuration
-├── package.json            # Node.js dependencies
-└── index.html              # Entry HTML file
-```
-
-**See [Fit4Life-UI/README.md](Fit4Life-UI/README.md) for detailed documentation.**
-
----
+React + Vite frontend at <http://localhost:5173>. Talks to the local
+backend via `VITE_API_URL` (set by docker-compose).
 
 ### 📂 [SQLite-Docker](SQLite-Docker)
-Docker configuration for the SQLite database server.
+Holds the canonical schema (`init.sql`). The `db-init` service in
+docker-compose applies it automatically to a per-machine Docker
+volume on first start.
 
+## Running without Docker (optional)
+
+For backend hacking with hot reload:
+
+```bash
+cd Fit4Life-Backend
+source venv/bin/activate
+cp .env.example .env  # override SQLITE_PATH to a local path
+make dev
 ```
-SQLite-Docker/
-├── Dockerfile              # Container image definition
-├── init.sql                # Database initialization script
-├── data/                   # Data persistence volume
-└── README.md               # Docker setup instructions
+
+For frontend hacking with HMR:
+
+```bash
+cd Fit4Life-UI
+pnpm install
+pnpm dev
 ```
 
-**See [SQLite-Docker/README.md](SQLite-Docker/README.md) for detailed documentation.**
-
----
-
-## Getting Started
-
-1. **Backend Setup**: See [Fit4Life-Backend/README.md](Fit4Life-Backend/README.md)
-2. **Frontend Setup**: See [Fit4Life-UI/README.md](Fit4Life-UI/README.md)
-3. **Database Setup**: See [SQLite-Docker/README.md](SQLite-Docker/README.md)
+Both default to the same ports as the containers (`:8000`, `:5173`).

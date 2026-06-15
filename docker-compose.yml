@@ -1,0 +1,66 @@
+name: fit4life
+
+volumes:
+  fit4life_db:
+
+services:
+  db-init:
+    image: alpine:3.20
+    volumes:
+      - fit4life_db:/data
+      - ./SQLite-Docker/init.sql:/init.sql:ro
+    command: >
+      sh -c "apk add --no-cache sqlite > /dev/null;
+        DB=/data/fit4life.db;
+        if [ ! -s \"$$DB\" ]; then
+          echo 'No DB found, initializing schema...';
+          sqlite3 \"$$DB\" < /init.sql;
+        elif sqlite3 \"$$DB\" 'SELECT password_hash FROM users LIMIT 1;' > /dev/null 2>&1; then
+          echo 'Schema already present, skipping.';
+        else
+          echo 'Detected pre-migration / wrong-shape schema. Dropping and re-initializing...';
+          sqlite3 \"$$DB\" 'DROP TABLE IF EXISTS runs; DROP TABLE IF EXISTS users;';
+          sqlite3 \"$$DB\" < /init.sql;
+          echo 'Re-initialized. Note: any pre-existing user/run rows were discarded.';
+        fi"
+    restart: "no"
+
+  backend:
+    build: ./Fit4Life-Backend
+    environment:
+      SQLITE_PATH: /data/fit4life.db
+      CORS_ORIGINS: http://localhost:5173
+      LOCAL_JWT_SECRET: ""
+      JWT_TTL_HOURS: "720"
+      PORT: "8000"
+    volumes:
+      - fit4life_db:/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/health', timeout=2).status == 200 else 1)\""]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+    restart: unless-stopped
+
+  frontend:
+    build: ./Fit4Life-UI
+    environment:
+      VITE_API_URL: http://localhost:8000/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5173 > /dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 15s
+    restart: unless-stopped

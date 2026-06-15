@@ -83,7 +83,7 @@ export default function Dashboard() {
   useEffect(() => {
     getSession().then(session => {
       if (!session) { navigate('/login'); return; }
-      setUserName(session.user.user_metadata?.name ?? session.user.email ?? '');
+      setUserName(session.user.name ?? session.user.email ?? '');
       loadRuns();
     });
   }, [navigate, loadRuns]);

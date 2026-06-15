@@ -11,6 +11,13 @@ class SignupRequest(BaseModel):
     name: str = Field(..., min_length=1, description="Display name")
 
 
+class SigninRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    email: str = Field(..., min_length=3)
+    password: str = Field(..., min_length=1)
+
+
 class SignupUser(BaseModel):
     id: str
     email: str
@@ -24,3 +31,13 @@ class SignupData(BaseModel):
 class SignupResponse(BaseModel):
     ok: Literal[True] = True
     data: SignupData
+
+
+class SigninData(BaseModel):
+    token: str
+    user: SignupUser
+
+
+class SigninResponse(BaseModel):
+    ok: Literal[True] = True
+    data: SigninData
