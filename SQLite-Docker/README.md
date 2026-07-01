@@ -1,5 +1,7 @@
 # Fit4Life SQLite Schema
 
+> See [DIAGRAMS.md](DIAGRAMS.md) for the ER diagram and `db-init` bootstrap flow.
+
 This directory holds the canonical database schema (`init.sql`). The
 schema is applied automatically by the `db-init` service in the
 repo-root `docker-compose.yml`. You do not need to run anything in this

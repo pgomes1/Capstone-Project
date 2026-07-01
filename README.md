@@ -49,6 +49,8 @@ the device.
 
 ## Project layout
 
+> See [DIAGRAMS.md](DIAGRAMS.md) for system architecture, user-flow, and data-flow diagrams (with links to per-component diagrams).
+
 ### 📂 [Fit4Life-Backend](Fit4Life-Backend)
 Python / FastAPI API at <http://localhost:8000/api>. Reads/writes a
 local SQLite database, issues its own JWTs (no cloud auth).

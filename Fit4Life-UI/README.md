@@ -1,6 +1,8 @@
 
 # Fit4Life UI
 
+> See [DIAGRAMS.md](DIAGRAMS.md) for routing, user flow, and sequence diagrams.
+
 React/TypeScript frontend for the Fit4Life fitness tracker application. Built with Vite, shadcn/ui, and Tailwind CSS.
 
 ## Directory Structure
