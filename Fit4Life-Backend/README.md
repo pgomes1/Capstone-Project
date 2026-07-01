@@ -1,5 +1,7 @@
 # Fit4Life Backend
 
+> See [DIAGRAMS.md](DIAGRAMS.md) for component, DFD, and API sequence diagrams.
+
 RESTful API server for the Fit4Life fitness tracker application. Built with Python and FastAPI.
 
 ## Directory Structure

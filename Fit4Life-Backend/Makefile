@@ -1,6 +1,6 @@
 PORT ?= 8000
 
-.PHONY: install dev run lint typecheck test docker-build
+.PHONY: install dev run lint typecheck test test-table docker-build
 
 install:
 	pip install -r requirements.txt -r requirements-dev.txt
@@ -18,7 +18,10 @@ typecheck:
 	pyright
 
 test:
-	pytest
+	python -m pytest tests/ -v
+
+test-table:
+	python tests/run_tests.py
 
 docker-build:
 	docker build -t fit4life-backend .
