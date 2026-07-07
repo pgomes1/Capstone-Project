@@ -142,6 +142,12 @@ Reusable UI components from shadcn/ui collection:
 ## Development
 
 ### Running Tests
+Runs the full suite in `src/tests/` — unit tests for `api.ts` and the
+dashboard utilities, plus the end-to-end workflow test
+(`workflow.e2e.test.tsx`), which renders the whole app and drives a
+signup → log run → logout flow with only `fetch` mocked at the network
+boundary:
+
 ```bash
 pnpm test
 # or

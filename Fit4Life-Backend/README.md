@@ -130,6 +130,25 @@ pip install -r requirements-dev.txt
 make dev
 ```
 
+## Testing
+
+Install dev dependencies once, then run the full suite — unit tests
+(`tests/test_auth.py`, `tests/test_runs.py`, `tests/test_models.py`) plus the
+HTTP-level workflow tests (`tests/test_e2e_workflow.py`, which drive signup →
+signin → add/list/delete runs and auth-failure paths through the real
+FastAPI app via `TestClient`):
+
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+make test
+```
+
+Or, for a formatted pass/fail table instead of pytest's default output:
+
+```bash
+make test-table
+```
+
 ## Docker
 
 Build and run the application in a container:

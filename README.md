@@ -110,3 +110,28 @@ pnpm dev
 The app is now available at <http://localhost:5173>.
 
 > **Note:** `VITE_API_URL` defaults to `http://localhost:8000/api` when unset, so no extra environment configuration is needed for local dev.
+
+## Running tests
+
+### Backend
+
+```bash
+cd Fit4Life-Backend
+source venv/bin/activate                                  # if not already active
+pip install -r requirements.txt -r requirements-dev.txt   # first time or after requirements change
+make test          # full suite via pytest
+make test-table    # same suite, printed as a pass/fail table
+```
+
+### Frontend
+
+```bash
+cd Fit4Life-UI
+pnpm test
+```
+
+Both commands run the entire suite, including the end-to-end workflow tests
+(`Fit4Life-Backend/tests/test_e2e_workflow.py` and
+`Fit4Life-UI/src/tests/workflow.e2e.test.tsx`), which drive full signup →
+login → run-tracking flows through the real API/app rather than mocking
+internals.
